@@ -37,6 +37,10 @@ const userSchema = mongoose.Schema({
     type: {
         type: String,
         default: "User"
+    },
+    device_token: {
+        type: String,
+        required: false
     }
 });
 

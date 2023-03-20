@@ -8,7 +8,7 @@ import notification from "../../admin/models/notification.js";
 const secret = "swriel";
 
 export const vendorsignin = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, device_token } = req.body;
     if (!email) {
         return res.status(200).json({
             status: 401,
@@ -43,6 +43,13 @@ export const vendorsignin = async (req, res) => {
             secret,
             { expiresIn: "2h" }
         );
+        const data = await vendor.findById(oldUser._id);
+
+
+
+        data.device_token = device_token;
+
+        await data.save();
         res.status(200).json({ result: oldUser, token, status: 200 });
     } catch (error) {
         res.status(500).json({ message: "Something Went Wrong" });

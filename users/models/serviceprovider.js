@@ -45,6 +45,10 @@ const serviceproviderSchema = mongoose.Schema({
     walletBalance: {
         type: Number,
         default: 0,
+    },
+    device_token: {
+        type: String,
+        required: false
     }
 });
 
