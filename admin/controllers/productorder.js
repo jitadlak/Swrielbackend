@@ -2,6 +2,9 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import notification from "../models/notification.js";
 import productOrder from "../models/productOrder.js";
+import FCM from "fcm-node/lib/fcm.js";
+var serverKey = 'AAAATkrD4Mw:APA91bGTcbqtrEqYGFMSsOD6zQT_yXW2nXHTUL7pTVGdZNNt8lWsiLUeM7NhF3xW__GZxCBroQzYV0WlJThtD_gxv90se3qr0J56u71MdvmJzOr0ddkhUaWeOSm5JSFdMgL2voea9UPt';
+var fcm = new FCM(serverKey);
 
 export const addproductorder = async (req, res) => {
     const {
@@ -92,6 +95,28 @@ export const addproductorder = async (req, res) => {
             notificationDescription: `Your product order Has Been Booked of amount ${TotalAmount}, We will Processing Your Order. `,
             toId: user._id,
         });
+        var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+            to: user.device_token,
+            collapse_key: 'your_collapse_key',
+
+            notification: {
+                title: 'Your Order Placed Successfully !!',
+                body: `Your product order Has Been Booked of amount ${TotalAmount}, We will Processing Your Order. `
+            },
+
+            data: {  //you can send only notification or only data(or include both)
+                message: 'my value',
+                type: 'my another value'
+            }
+        };
+
+        fcm.send(message, function (err, response) {
+            if (err) {
+                console.log("Something has gone wrong!", err);
+            } else {
+                console.log("Successfully sent with response: ", response);
+            }
+        });
         return res.status(200).json({ result, status: 200 });
     } catch (error) {
         res.status(500).json({ message: "Something Went Wrong" });
@@ -153,6 +178,28 @@ export const assignvendorprovider = async (req, res) => {
             notificationTitle: "Congrates !! New Product Order Assigned To You ",
             notificationDescription: ` Product Order Assigned To You Address - ${oldOrder.addressLine1} ${oldOrder.city} , Please Check !! `,
             toId: assignTo,
+        });
+        var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+            to: user.device_token,
+            collapse_key: 'your_collapse_key',
+
+            notification: {
+                title: 'Product Assigned To Our Vendor',
+                body: `Your Product Order Has Been Assigned To Our Vendor `
+            },
+
+            data: {  //you can send only notification or only data(or include both)
+                message: 'my value',
+                type: 'my another value'
+            }
+        };
+
+        fcm.send(message, function (err, response) {
+            if (err) {
+                console.log("Something has gone wrong!", err);
+            } else {
+                console.log("Successfully sent with response: ", response);
+            }
         });
         // console.log(oldOrder)
         res.status(200).json({

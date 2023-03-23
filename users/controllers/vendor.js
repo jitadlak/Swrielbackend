@@ -69,6 +69,7 @@ export const vendorsignup = async (req, res) => {
         storeaddress,
         websitelink,
         membership,
+        productCategory
 
     } = req.body;
     console.log(req.body);
@@ -122,12 +123,7 @@ export const vendorsignup = async (req, res) => {
             message: "Store Address Is Required",
         });
     }
-    if (!membership) {
-        return res.status(200).json({
-            status: 401,
-            message: "Membership Is Required",
-        });
-    }
+
     try {
         const oldUser = await vendor.findOne({ email });
 
@@ -150,6 +146,7 @@ export const vendorsignup = async (req, res) => {
             storeaddress,
             websitelink,
             membership,
+            productCategory
         });
 
         const token = jwt.sign(

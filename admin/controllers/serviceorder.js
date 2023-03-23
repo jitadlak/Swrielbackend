@@ -4,7 +4,9 @@ import serviceOrder from "../models/serviceOrder.js";
 import UserModal from "../../users/models/user.js";
 import subcategories from "../models/subcategories.js";
 import notification from "../models/notification.js";
-
+import FCM from "fcm-node/lib/fcm.js";
+var serverKey = 'AAAATkrD4Mw:APA91bGTcbqtrEqYGFMSsOD6zQT_yXW2nXHTUL7pTVGdZNNt8lWsiLUeM7NhF3xW__GZxCBroQzYV0WlJThtD_gxv90se3qr0J56u71MdvmJzOr0ddkhUaWeOSm5JSFdMgL2voea9UPt';
+var fcm = new FCM(serverKey);
 export const addserviceorder = async (req, res) => {
     const {
         userId,
@@ -101,6 +103,28 @@ export const addserviceorder = async (req, res) => {
             notificationDescription: `Your Service Has Been Booked of amount ${serviceAmount} on ${serviceDate}  and  Slot ${serviceTime} ${serviceSlot} , Please Be Available . `,
             toId: userId,
         })
+        var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+            to: userDetail.device_token,
+            collapse_key: 'your_collapse_key',
+
+            notification: {
+                title: 'Your Service Booking Is Confirmed !!',
+                body: `Your Service Has Been Booked of amount ${serviceAmount} on ${serviceDate}  and  Slot ${serviceTime} ${serviceSlot} , Please Be Available . `
+            },
+
+            data: {  //you can send only notification or only data(or include both)
+                message: 'my value',
+                type: 'my another value'
+            }
+        };
+
+        fcm.send(message, function (err, response) {
+            if (err) {
+                console.log("Something has gone wrong!", err);
+            } else {
+                console.log("Successfully sent with response: ", response);
+            }
+        });
         return res.status(200).json({ result, status: 200 });
     } catch (error) {
         res.status(500).json({ message: "Something Went Wrong" });
