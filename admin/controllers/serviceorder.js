@@ -5,6 +5,7 @@ import UserModal from "../../users/models/user.js";
 import subcategories from "../models/subcategories.js";
 import notification from "../models/notification.js";
 import FCM from "fcm-node/lib/fcm.js";
+import serviceprovider from "../../users/models/serviceprovider.js";
 var serverKey = 'AAAATkrD4Mw:APA91bGTcbqtrEqYGFMSsOD6zQT_yXW2nXHTUL7pTVGdZNNt8lWsiLUeM7NhF3xW__GZxCBroQzYV0WlJThtD_gxv90se3qr0J56u71MdvmJzOr0ddkhUaWeOSm5JSFdMgL2voea9UPt';
 var fcm = new FCM(serverKey);
 export const addserviceorder = async (req, res) => {
@@ -197,6 +198,59 @@ export const assignserviceprovider = async (req, res) => {
             notificationDescription: ` Service Order Assigned To You Address - ${oldOrder.addressLine1} ${oldOrder.city} , Please Check !! `,
             toId: serviceProviderId,
         })
+        const providerData = await serviceprovider.findById(serviceProviderId);
+        if (providerData) {
+            var message = {
+                //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+                to: providerData.device_token,
+                collapse_key: "your_collapse_key",
+
+                notification: {
+                    title: "Congrates !! New Service Order Assigned To You ",
+                    body: `New Service  Assigned To You, Please Check  !!`,
+                },
+
+                data: {
+                    //you can send only notification or only data(or include both)
+                    message: "my value",
+                    type: "my another value",
+                },
+            };
+
+            fcm.send(message, function (err, response) {
+                if (err) {
+                    console.log("Something has gone wrong!", err);
+                } else {
+                    console.log("Successfully sent with response: ", response);
+                }
+            });
+        }
+        if (oldOrder?.userId?.device_token) {
+            var message = {
+                //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+                to: oldOrder?.userId?.device_token,
+                collapse_key: "your_collapse_key",
+
+                notification: {
+                    title: "Order Update ",
+                    body: `Your Service Assigned To Our Service Provider !!`,
+                },
+
+                data: {
+                    //you can send only notification or only data(or include both)
+                    message: "my value",
+                    type: "my another value",
+                },
+            };
+
+            fcm.send(message, function (err, response) {
+                if (err) {
+                    console.log("Something has gone wrong!", err);
+                } else {
+                    console.log("Successfully sent with response: ", response);
+                }
+            });
+        }
         // console.log(oldOrder)
         res.status(200).json({
             result: {
@@ -247,6 +301,32 @@ export const setserviceorderstatus = async (req, res) => {
         oldOrder.serviceStatus = serviceStatus
 
         await oldOrder.save()
+        if (oldOrder?.userId?.device_token) {
+            var message = {
+                //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+                to: oldOrder?.userId?.device_token,
+                collapse_key: "your_collapse_key",
+
+                notification: {
+                    title: "Order Update ",
+                    body: `Your Service Status - ${serviceStatus}!!`,
+                },
+
+                data: {
+                    //you can send only notification or only data(or include both)
+                    message: "my value",
+                    type: "my another value",
+                },
+            };
+
+            fcm.send(message, function (err, response) {
+                if (err) {
+                    console.log("Something has gone wrong!", err);
+                } else {
+                    console.log("Successfully sent with response: ", response);
+                }
+            });
+        }
         // console.log(oldOrder)
         res.status(200).json({
             result: {
@@ -265,7 +345,7 @@ export const getServiceOrderById = async (req, res) => {
     try {
         const data = await serviceOrder.find({ userid: req.params.id });
         console.log(data, 'jjjj')
-        if (!data) {
+        if (data.length <= 0) {
             return res.status(200).json({ message: "No Service Order !!", status: 400 });
         }
         if (data.length > 0) {

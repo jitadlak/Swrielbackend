@@ -49,6 +49,10 @@ const serviceproviderSchema = mongoose.Schema({
     device_token: {
         type: String,
         required: false
+    },
+    productCategory: {
+        type: Array,
+        required: false
     }
 });
 

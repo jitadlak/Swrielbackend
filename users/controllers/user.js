@@ -50,28 +50,28 @@ export const signin = async (req, res) => {
         await data.save();
 
 
-        var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
-            to: device_token,
-            collapse_key: 'your_collapse_key',
+        // var message = { //this may vary according to the message type (single recipient, multicast, topic, et cetera)
+        //     to: device_token,
+        //     collapse_key: 'your_collapse_key',
 
-            notification: {
-                title: 'Title of your push notification',
-                body: 'Body of your push notification'
-            },
+        //     notification: {
+        //         title: 'Title of your push notification',
+        //         body: 'Body of your push notification'
+        //     },
 
-            data: {  //you can send only notification or only data(or include both)
-                message: 'my value',
-                type: 'my another value'
-            }
-        };
+        //     data: {  //you can send only notification or only data(or include both)
+        //         message: 'my value',
+        //         type: 'my another value'
+        //     }
+        // };
 
-        fcm.send(message, function (err, response) {
-            if (err) {
-                console.log("Something has gone wrong!", err);
-            } else {
-                console.log("Successfully sent with response: ", response);
-            }
-        });
+        // fcm.send(message, function (err, response) {
+        //     if (err) {
+        //         console.log("Something has gone wrong!", err);
+        //     } else {
+        //         console.log("Successfully sent with response: ", response);
+        //     }
+        // });
 
 
         res.status(200).json({ result: oldUser, token, status: 200 });

@@ -45,9 +45,8 @@ export const providersignin = async (req, res) => {
         );
         const data = await serviceprovider.findById(oldUser._id);
 
-
-
         data.device_token = device_token;
+        await data.save();
         res.status(200).json({ result: oldUser, token, status: 200 });
     } catch (error) {
         res.status(500).json({ message: "Something Went Wrong" });
@@ -65,6 +64,7 @@ export const providersignup = async (req, res) => {
         address,
         IDDocument,
         membership,
+        serviceCategory,
     } = req.body;
     console.log(req.body);
 
@@ -127,6 +127,7 @@ export const providersignup = async (req, res) => {
             });
         }
         const hashedPassword = await bcrypt.hash(password, 12);
+        let serviceID = Math.floor(Math.random() * 90000) + 10000;
 
         const result = await serviceprovider.create({
             email,
@@ -137,9 +138,8 @@ export const providersignup = async (req, res) => {
             address,
             IDDocument,
             membership,
-            serviceId: `${name.split(" ").slice(0, -1).join}${(
-                "" + Math.random()
-            ).substring(2, 7)}`,
+            serviceId: serviceID,
+            serviceCategory,
         });
 
         const token = jwt.sign({ email: result.email, _id: result._id }, secret, {
@@ -222,7 +222,7 @@ export const updateproviderbalance = async (req, res) => {
             notificationTitle: "Wallet Balance Updated ",
             notificationDescription: `Your wallet Balance Has Been Updated - ${comment} !!`,
             toId: _id,
-        })
+        });
         // con
         res.status(200).json({
             result: {
@@ -237,14 +237,8 @@ export const updateproviderbalance = async (req, res) => {
     }
 };
 
-
 export const addserviceproviderequest = async (req, res) => {
-    const {
-        amount,
-        serviceprovider,
-        approved,
-
-    } = req.body;
+    const { amount, serviceprovider, approved } = req.body;
     console.log(req.body);
 
     if (!amount) {
@@ -261,13 +255,11 @@ export const addserviceproviderequest = async (req, res) => {
     }
 
     try {
-
         const result = await serviceproviderwithdrawrequest.create({
             amount,
             serviceprovider,
             approved,
         });
-
 
         res.status(200).json({ result, status: 200 });
     } catch (error) {
@@ -302,26 +294,28 @@ export const providerVerify = async (req, res) => {
     if (!serviceId) {
         return res.status(200).json({
             message: "Provider ID Is Required",
-            status: 400
+            status: 400,
         });
     }
 
     try {
-        const serviceProvider = await serviceprovider.findOne({ serviceId: serviceId });
+        const serviceProvider = await serviceprovider.findOne({
+            serviceId: serviceId,
+        });
         if (!serviceProvider) {
             return res.status(200).json({
                 message: "Invalid Provider ID !!",
-                status: 400
+                status: 400,
             });
         }
         // await promos.updateOne({ $push: { users: userId } })
         return res.status(200).json({
             message: "Service ID Verfied",
             status: 200,
-            result: serviceProvider
+            result: serviceProvider,
         });
     } catch (error) {
         res.status(500).json({ message: "Something Went Wrong" });
         console.log(error);
     }
-}
+};

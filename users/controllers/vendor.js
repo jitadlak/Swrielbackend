@@ -69,7 +69,8 @@ export const vendorsignup = async (req, res) => {
         storeaddress,
         websitelink,
         membership,
-        productCategory
+        productCategory,
+
 
     } = req.body;
     console.log(req.body);
@@ -146,7 +147,8 @@ export const vendorsignup = async (req, res) => {
             storeaddress,
             websitelink,
             membership,
-            productCategory
+            productCategory,
+
         });
 
         const token = jwt.sign(
