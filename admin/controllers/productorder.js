@@ -288,7 +288,7 @@ export const setproductorderstatus = async (req, res) => {
         if (oldOrder?.user?.device_token) {
             var message = {
                 //this may vary according to the message type (single recipient, multicast, topic, et cetera)
-                to: venderData.device_token,
+                to: oldOrder?.user?.device_token,
                 collapse_key: "your_collapse_key",
 
                 notification: {
